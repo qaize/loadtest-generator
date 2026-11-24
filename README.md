@@ -1,13 +1,8 @@
 # k6 Load Test Builder
 
-A small React + TypeScript app for configuring one Grafana k6 HTTP load test, previewing the generated JavaScript, and downloading it as a `.js` file — **`blabla.js` by default, or any valid name you type**.
+A small React + TypeScript app for configuring one Grafana k6 HTTP load test, previewing the generated JavaScript, downloading it as a `.js` file — **`blabla.js` by default, or any valid name you type** — and optionally running it through a local k6 runner.
 
-This version is **configuration and export only**:
-
-- It does **not** run k6 or start a process.
-- It does **not** send requests to the target URL.
-- It has no backend, saved configurations, or test history.
-- There are no Start/Stop controls.
+The browser still only configures, previews, and exports. A separate **local runner** (`npm run runner`) is required to execute k6: the browser cannot start processes, and running on your machine is what makes VPN-only targets reachable. See [Local runner](#local-runner).
 
 ## Supported settings
 
@@ -70,7 +65,65 @@ The **Scenario guide** button in the header opens an accessible modal that expla
 - **Step 2 — Workload and executor:** a comparison table for all six executors, duration syntax, stage rules, arrival-rate sizing, and advanced scenario timing.
 - **Step 3 — Optional settings and export:** thresholds, checks, tags, HTTP behavior, pacing, and file-name/download rules.
 
-The modal also includes a worked example and the reminder that scripts are exported only. It closes with `Escape`, the close button, the backdrop, or the **Start building** button; focus is trapped inside and returned to the trigger on close.
+The modal also includes a worked example and the reminder that the browser itself never runs k6. It closes with `Escape`, the close button, the backdrop, or the **Start building** button; focus is trapped inside and returned to the trigger on close.
+
+## Local runner
+
+The **Run against a local k6** panel sends the form to a small Node server that rebuilds the script from the form, runs k6 on your machine, and streams the output back over Server-Sent Events.
+
+Why a local runner:
+
+- Browsers cannot spawn `k6`.
+- Traffic must leave from your network, so targets reachable only through your VPN work.
+- Deploying this UI to a remote host does **not** let it call a runner on your laptop. The page and runner must run on the same machine (or the runner must be exposed deliberately, which is not recommended).
+
+### Requirements
+
+- k6 installed and on `PATH` (`k6 version`), or set `K6_BINARY` to the executable.
+- Node 22+ (the repo already requires a modern Node for Vite).
+
+### Run it
+
+```bash
+npm install
+npm run runner   # terminal 1: http://127.0.0.1:8787
+npm run dev      # terminal 2: http://localhost:5173
+```
+
+Open the app and press **Run test locally** in the panel under the preview. **Stop** terminates k6 and keeps the final exit signal.
+
+### What the runner does
+
+1. Receives the draft configuration as JSON (`POST /run`).
+2. Re-validates it on the server. Invalid input is rejected with `422`; the browser-side validation is never trusted.
+3. Generates a temporary `loadtest.js`, runs `k6 run --summary-export summary.json --quiet loadtest.js`, and deletes the directory afterwards. `--quiet` hides the per-second progress lines; the final summary and any errors are still streamed.
+4. Streams `start`, `stdout`, `stderr`, and `done` events through `GET /runs/:id` (SSE).
+5. Stops the process through `POST /stop/:id`.
+
+### Safety limits
+
+- Binds to `127.0.0.1` by default and rejects non-loopback origins, so a website on the internet cannot drive it. `npm run dev -- --host` would expose the Vite proxy, so keep the dev server on localhost when the runner is running.
+- Never accepts arbitrary JavaScript or arbitrary CLI flags, only the structured form fields.
+- 64 KB request-body limit, one process per run, and a 10-minute wall-clock limit.
+- Job output is kept in memory only for the run and five minutes after it finishes.
+
+### Configuration
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `K6_BINARY` | `k6` | Path to the k6 executable |
+| `K6_RUNNER_HOST` | `127.0.0.1` | Bind address |
+| `K6_RUNNER_PORT` | `8787` | Port |
+| `K6_RUNNER_ORIGIN` | `http://localhost:5173,http://127.0.0.1:5173` | Extra allowed origins; loopback origins on any port are always allowed |
+| `K6_RUNNER_MAX_MS` | `600000` | Hard per-run time limit in milliseconds |
+
+If the target needs a VPN, connect the VPN first and confirm it works from the same terminal:
+
+```bash
+k6 run blabla.js
+```
+
+The runner inherits the machine's network stack. A full-tunnel VPN is used automatically; for split tunneling, make sure the target's route goes through the VPN.
 
 ## Generated script
 
@@ -114,11 +167,15 @@ src/
     serialize.ts      Safe JavaScript literal serialization
   curl/
     parseCurl.ts      cURL command tokenizer and importer
+  runner/
+    client.ts         Browser client for the local runner (POST + SSE)
   download/
     downloadScript.ts Browser download behavior
-  components/         Focused UI controls and preview panel
+  components/         Focused UI controls, preview, and run panel
   App.tsx             State orchestration
   styles.css          Responsive interface styles
+server/
+  runner.ts           Local k6 HTTP runner (Node, SSE, stop)
 ```
 
 ## Commands
@@ -126,11 +183,12 @@ src/
 ```bash
 npm install
 npm run dev        # start the app
+npm run runner     # start the local k6 runner on 127.0.0.1:8787
 npm run typecheck  # tsc --noEmit
 npm run lint       # ESLint
 npm test           # Vitest unit and UI tests
 npm run build      # typecheck + production build
-npm run preview    # preview the production build
+npm run preview    # preview the production build (also proxies the runner)
 ```
 
 ## Documentation verified

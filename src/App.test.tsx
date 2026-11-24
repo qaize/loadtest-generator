@@ -139,7 +139,7 @@ describe('App', () => {
       within(dialog).getByRole('heading', { name: 'Optional settings and export' }),
     ).toBeInTheDocument();
     expect(within(dialog).getByText('constant-arrival-rate')).toBeInTheDocument();
-    expect(within(dialog).getByText(/only configures and exports scripts/i)).toBeInTheDocument();
+    expect(within(dialog).getByText(/never runs k6 by itself/i)).toBeInTheDocument();
 
     await user.keyboard('{Escape}');
 

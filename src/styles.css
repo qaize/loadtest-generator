@@ -1296,6 +1296,306 @@ input[type="radio"] {
   text-decoration: underline;
 }
 
+.run-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow:
+    0 30px 70px -50px rgba(41, 25, 100, 0.55),
+    0 1px 0 rgba(255, 255, 255, 0.8) inset;
+}
+
+.run-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.run-head h2 {
+  margin: 4px 0 0;
+  font-size: 20px;
+  letter-spacing: -0.03em;
+}
+
+.run-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex: 0 0 auto;
+  padding: 6px 11px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #faf9fe;
+  color: var(--muted-strong);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.run-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #9a94aa;
+}
+
+.run-status--starting,
+.run-status--running {
+  border-color: #d6cff0;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.run-status--starting .run-status-dot,
+.run-status--running .run-status-dot {
+  background: var(--accent);
+  animation: run-pulse 1.4s ease-in-out infinite;
+}
+
+.run-status--passed {
+  border-color: #bfe6d2;
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.run-status--passed .run-status-dot {
+  background: var(--success);
+}
+
+.run-status--failed,
+.run-status--error {
+  border-color: var(--danger-border);
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.run-status--failed .run-status-dot,
+.run-status--error .run-status-dot {
+  background: var(--danger);
+}
+
+.run-status--stopped {
+  border-color: var(--warning-border);
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+.run-status--stopped .run-status-dot {
+  background: var(--warning);
+}
+
+.run-note {
+  max-width: 860px;
+  margin: 0;
+  color: var(--muted-strong);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.run-setup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  margin: 0;
+  padding: 11px 14px 11px 28px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 10px;
+  background: #fbfafe;
+  color: var(--muted-strong);
+  font-size: 12px;
+}
+
+.run-setup li::marker {
+  color: var(--accent);
+}
+
+.run-setup code,
+.run-hint code {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--accent-soft);
+  color: #3d2a99;
+}
+
+.run-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.run-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 18px;
+  border: 0;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #0f9d6e, #0a7a55);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+  box-shadow: 0 14px 24px -16px rgba(10, 122, 85, 0.9);
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease,
+    opacity 140ms ease;
+}
+
+.run-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 18px 28px -16px rgba(10, 122, 85, 0.95);
+}
+
+.run-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.run-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+  box-shadow: none;
+}
+
+.run-button:focus-visible,
+.run-stop:focus-visible {
+  outline: 3px solid rgba(108, 76, 255, 0.24);
+  outline-offset: 2px;
+}
+
+.run-stop {
+  padding: 10px 16px;
+}
+
+.run-id {
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 10.5px;
+}
+
+.run-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.run-progress-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--muted-strong);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 11px;
+}
+
+.run-progress-track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #ece8f6;
+}
+
+.run-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #7557ff, #0f9d6e);
+  transition: width 500ms linear;
+}
+
+.run-progress-fill.is-indeterminate {
+  width: 35%;
+  animation: run-indeterminate 1.4s ease-in-out infinite;
+}
+
+@keyframes run-indeterminate {
+  0% {
+    transform: translateX(-110%);
+  }
+  100% {
+    transform: translateX(320%);
+  }
+}
+
+.run-feedback {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--warning-border);
+  border-radius: 9px;
+  background: var(--warning-soft);
+  color: #6f4305;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.run-feedback.is-error {
+  border-color: var(--danger-border);
+  background: var(--danger-soft);
+  color: #7b1e15;
+  font-weight: 600;
+}
+
+.run-exit {
+  margin: 0;
+  color: var(--muted-strong);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 11px;
+}
+
+.run-output {
+  min-height: 190px;
+  max-height: 420px;
+  margin: 0;
+  padding: 14px 16px;
+  overflow: auto;
+  border: 1px solid #2b2338;
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 80px),
+    var(--code-bg);
+  color: #e9e5f6;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", monospace;
+  font-size: 11.5px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.run-output code {
+  font: inherit;
+  color: inherit;
+}
+
+.run-output:focus-visible {
+  outline: 3px solid #b8a8ff;
+  outline-offset: 2px;
+}
+
+.run-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+@keyframes run-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
 .app-footer {
   display: flex;
   justify-content: space-between;
@@ -1632,6 +1932,24 @@ input[type="radio"] {
 
   .guide-foot .primary-button {
     width: 100%;
+  }
+
+  .run-head {
+    flex-direction: column;
+  }
+
+  .run-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .run-actions .run-button,
+  .run-actions .run-stop {
+    width: 100%;
+  }
+
+  .run-id {
+    text-align: center;
   }
 
   .hero {

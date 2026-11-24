@@ -117,8 +117,8 @@ export function PreviewPanel({
 
       <footer className="preview-footer">
         <p>
-          Everything stays in your browser. This tool does not execute k6, and it
-          never sends a request to the target URL.
+          Download the script or run it through the local runner below. The preview
+          itself never contacts the target URL.
         </p>
         <a href={K6_DOCS_URL} target="_blank" rel="noreferrer">
           k6 documentation ↗

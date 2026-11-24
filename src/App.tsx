@@ -6,6 +6,7 @@ import { OptionalGroup } from './components/OptionalGroup';
 import { PacingSection } from './components/PacingSection';
 import { PreviewPanel } from './components/PreviewPanel';
 import { RequestSection } from './components/RequestSection';
+import { RunPanel } from './components/RunPanel';
 import { TagsSection } from './components/TagsSection';
 import { ThresholdsSection } from './components/ThresholdsSection';
 import { WorkloadSection } from './components/WorkloadSection';
@@ -140,17 +141,18 @@ export default function App() {
           <div>
             <p className="eyebrow">Grafana k6 · script export</p>
             <h2 id="hero-heading">
-              Shape a load test. Export a script you can review.
+              Shape a load test. Export the script, or run it locally.
             </h2>
             <p>
               Build a single-scenario HTTP test with documented k6 options,
-              inspect the generated JavaScript, then download it with the file
-              name you choose — <code>blabla.js</code> by default.
+              inspect the generated JavaScript, download it with the file name you
+              choose — <code>blabla.js</code> by default — or run it through the
+              local runner so VPN-only targets stay reachable.
             </p>
           </div>
           <p className="hero-badge">
-            <strong>Export only</strong>
-            No test runs from this page.
+            <strong>Export or run locally</strong>
+            Scripts export here; running uses your own k6.
           </p>
         </section>
 
@@ -272,6 +274,7 @@ export default function App() {
                   <li>Test-wide tags and selected HTTP options</li>
                   <li>Iteration sleep and a live script preview</li>
                   <li>Editable export file name, defaulting to blabla.js</li>
+                  <li>Optional local k6 run with streamed output and Stop</li>
                 </ul>
               </div>
               <div className="scope-deferred">
@@ -298,10 +301,16 @@ export default function App() {
             onDownload={handleDownload}
           />
         </div>
+
+        {/* The runner re-validates this draft, so it never trusts browser-side checks. */}
+        <RunPanel config={draft} valid={validation.valid} />
       </main>
 
       <footer className="app-footer">
-        <p>Local configuration and export only. No backend, no saved tests.</p>
+        <p>
+          Runs happen only through the local runner on this machine. Nothing is
+          uploaded and no test history is stored.
+        </p>
         <p>Not affiliated with Grafana Labs.</p>
       </footer>
 

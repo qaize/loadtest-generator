@@ -149,7 +149,8 @@ export function GuideModal({ open, onClose }: GuideModalProps) {
             <li>
               <strong>Target URL.</strong> A complete <code>http://</code> or{' '}
               <code>https://</code> URL, including path and query string. The
-              builder never sends a request to it.
+              builder never contacts it; only the optional local runner does, from
+              your own machine.
             </li>
             <li>
               <strong>HTTP method.</strong> <code>GET</code> and <code>HEAD</code>{' '}
@@ -294,6 +295,12 @@ export function GuideModal({ open, onClose }: GuideModalProps) {
               path separators or characters Windows rejects.
             </li>
           </ul>
+          <p className="guide-note">
+            To execute the test, start <code>npm run runner</code> and{' '}
+            <code>npm run dev</code>, then press <strong>Run test locally</strong>{' '}
+            below the preview. That is the only path that runs k6, and it runs on
+            your machine so VPN-only targets are reachable.
+          </p>
         </section>
 
         <section className="guide-example" aria-labelledby="guide-example-heading">
@@ -325,8 +332,9 @@ export function GuideModal({ open, onClose }: GuideModalProps) {
 
         <footer className="guide-foot">
           <p>
-            This builder only configures and exports scripts. It never executes k6
-            and never sends requests to the target URL.
+            The browser never runs k6 by itself. Scripts execute only through the
+            local runner you start on your machine, and only against the URL you
+            configured.
           </p>
           <button type="button" className="primary-button" onClick={onClose}>
             Start building
